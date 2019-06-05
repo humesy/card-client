@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  socket: "https://open-face-server.herokuapp.com/"
 };

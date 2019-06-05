@@ -1,20 +1,123 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<div *ngIf="connected" class="container">
+  <div class="row" style="height: 150px">
+    <div class="col">
+      <h1>{{player1}}</h1>
+      <span class="bust other" *ngIf="player1Hand && busted[1]">{{player1Hand}}</span>
+      <span class="score other" *ngIf="player1Hand && !busted[1]">{{player1Hand}}</span>
+    </div>
+    <div class="col">
+      <h1>You</h1>
+      <span class="bust" *ngIf="lastHand && busted[0]">{{lastHand}}</span>
+      <span class="score" *ngIf="lastHand && !busted[0]">{{lastHand}}</span>
+    </div>
+    <div class="col">
+      <h1>{{player2}}</h1>
+      <span class="bust other" *ngIf="player2Hand && busted[2]">{{player2Hand}}</span>
+      <span class="score other" *ngIf="player2Hand && !busted[2]">{{player2Hand}}</span>
+    </div>
+  </div>
 
+  <div class="row">
+    <div class="col" style="color: powderblue">
+      <span *ngFor="let i of p1top">
+        <img src="{{i}}" style="height: 150px; border:1px solid black">
+      </span>
+    </div>
+    <div class="col">
+      <span *ngFor="let i of top; let o = index">
+        <img (click)="grab(i, top, o)" src="{{i.image}}" style="height: 150px; border:1px solid black">
+      </span>
+    </div>
+    <div class="col" style="color: powderblue">
+      <span *ngFor="let i of p2top">
+        <img src="{{i}}" style="height: 150px; border:1px solid black">
+      </span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col" style="color: powderblue">
+      <span *ngFor="let i of p1mid">
+        <img src="{{i}}" style="height: 150px; border:1px solid black">
+      </span>
+    </div>
+    <div class="col">
+      <span *ngFor="let i of mid; let o = index">
+        <img (click)="grab(i, mid, o)" src="{{i.image}}" style="height: 150px; border:1px solid black">
+      </span>
+    </div>
+    <div class="col" style="color: powderblue">
+      <span *ngFor="let i of p2mid">
+        <img src="{{i}}" style="height: 150px; border:1px solid black">
+      </span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col" style="color: powderblue">
+      <span *ngFor="let i of p1bot">
+        <img src="{{i}}" style="height: 150px; border:1px solid black">
+      </span>
+    </div>
+    <div class="col">
+      <span *ngFor="let i of bot; let o = index">
+        <img (click)="grab(i, bot, o)" src="{{i.image}}" style="height: 150px; border:1px solid black">
+      </span>
+    </div>
+    <div class="col" style="color: powderblue">
+      <span *ngFor="let i of p2bot">
+        <img src="{{i}}" style="height: 150px; border:1px solid black">
+      </span>
+    </div>
+  </div>
+
+  <div class="row" style="height: 94px">
+    <div class="col" style="color: powderblue">
+      F
+    </div>
+    <div class="col">
+      <button class="btn green" *ngIf="done == 0" (click)="submit()">Submit</button>
+      <span class="status" *ngIf="done == 2">Waiting for other players...</span>
+      <button class="btn green" *ngIf="done == 3" (click)="ready()">Next Game</button>
+    </div>
+    <div class="col" style="color: powderblue">
+      F
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="status">
+        <span>Game Round: {{round}}</span><br>
+        <span>Games Played: {{gamesPlayed}}</span>
+      </div>
+    </div>
+    <div class="col">
+      <img (click)="grab(you[0], you, 0)" src="{{you[0].image}}" style="height: 150px; border:1px solid black">
+      <img (click)="grab(you[1], you, 1)" src="{{you[1].image}}" style="height: 150px; border:1px solid black">
+      <img (click)="grab(you[2], you, 2)" src="{{you[2].image}}" style="height: 150px; border:1px solid black">
+      <img (click)="grab(you[3], you, 3)" src="{{you[3].image}}" style="height: 150px; border:1px solid black">
+      <img (click)="grab(you[4], you, 4)" src="{{you[4].image}}" style="height: 150px; border:1px solid black">
+      <br>
+      <!-- <button class="btn" (click)="draw()">Draw</button> -->
+      <button class="btn" *ngIf="user == 'Lee'" (click)="reset(false)">Reset</button>
+    </div>
+    <div class="col" style="color: powderblue">
+      F
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!connected" class="container">
+  <div class="row" style="padding-top: 10%">
+    <div class="col" style="color: powderblue">F</div>
+    <div class="col" style="font-size: 100px">
+      Enter Name
+      <input [(ngModel)]="user" (keyup)="checkEnter($event)" type="text" id="user" class="form-control"
+        style="height: 50px; width: 300px; font-size: 45px">
+      <br>
+      <button class="btn" (click)="connect()">Connect</button>
+    </div>
+    <div class="col" style="color: powderblue">F</div>
+  </div>
+</div>
